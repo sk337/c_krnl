@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-// Existing VGA code
 typedef unsigned long size_t;
 const int VGA_WIDTH = 80;
 const int VGA_HEIGHT = 25;
@@ -53,6 +52,11 @@ public:
             }
             putChar(str[i], column++, row);
         }
+    }
+
+    void println(const char* str) {
+        print(str);
+        incrementRow();
     }
 
     void printNumber(unsigned int num) {
@@ -164,29 +168,50 @@ public:
         return ((double)(rdtsc() - start) / cpu_frequency_hz) * 1000000.0;
     }
 
+
+
     void reset() {
         start = rdtsc();
     }
 };
 
-// Helper function to convert unsigned long long to string and print it
 
+enum Status {
+    OK=0,
+    ERROR=1,
+    INFO=2,
+};
+
+void printStatus(VGA& vga, Status status, const char* message) {
+    vga.print("[");
+    if (status == OK) {
+        vga.setColor(COLOR::Green, COLOR::Black);
+        vga.print("OK");
+    } else if (status == ERROR) {
+        vga.setColor(COLOR::LightRed, COLOR::Black);
+        vga.print("ERROR");
+    } else if (status == INFO) {
+        vga.setColor(COLOR::LightBlue, COLOR::Black);
+        vga.print("INFO");
+    }
+    vga.setColor(COLOR::White, COLOR::Black);
+    vga.print("] ");
+    vga.print(message);
+    vga.print("\n");
+}
 
 // Main kernel function
 extern "C" void kernel_main() {
     VGA vga(0, 0, COLOR::White, COLOR::Black);
     vga.clear();
-    vga.print("Hello from VGA!\n");
+
+    printStatus(vga, Status::INFO, "Kernel Loaded");
 
     Timer timer(get_cpu_base_frequency());
 
-    vga.print("[");
-    vga.setColor(COLOR::Green, COLOR::Black);
-    vga.print("OK");
-    vga.setColor(COLOR::White, COLOR::Black);
-    vga.print("] Timer started @ ");
-    vga.printNumber((long long)timer.elapsed_milliseconds());
-    vga.print(" seconds\n");
+    printStatus(vga, Status::OK, "Timer Started");
+
+    printStatus(vga, Status::ERROR, "Oh noes! An error occurred!");
 
 
     // Halt the CPU
