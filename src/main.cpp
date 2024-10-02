@@ -213,6 +213,7 @@ extern "C" void kernel_main() {
 
     printStatus(vga, Status::ERROR, "Oh noes! An error occurred!");
 
+    vga.println("This is my program so far :P");
 
     // Halt the CPU
     while (1) {
