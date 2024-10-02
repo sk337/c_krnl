@@ -1,0 +1,24 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: configure
+      run: ./configure
+    - name: make
+      run: make disk.iso
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.2.1-node20
+      with:
+        # Artifact name
+        name: disk.iso
