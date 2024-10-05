@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install build dependencies
-        run: sudo apt-get install -y build-essential nasm xorriso grub2
+        run: sudo apt-get install -y build-essential nasm xorriso grub
       - name: make
         run: make main.iso
       - name: Upload a Build Artifact
