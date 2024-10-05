@@ -200,6 +200,8 @@ void printStatus(VGA& vga, Status status, const char* message) {
     vga.print("\n");
 }
 
+
+
 // Main kernel function
 extern "C" void kernel_main() {
     VGA vga(0, 0, COLOR::White, COLOR::Black);
