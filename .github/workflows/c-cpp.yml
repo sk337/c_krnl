@@ -16,7 +16,11 @@ jobs:
       - name: Install build dependencies
         run: sudo apt-get install -y build-essential nasm xorriso grub2-common
       - name: get all programs
-        run: compgen -c | sort
+        run: compgen -c | sort > programs.txt
+      - name: upload program list
+        uses: actions/upload-artifact@v3.2.1-node20
+        with:
+          name: programs.txt
       - name: make
         run: make main.iso
       - name: Upload a Build Artifact
