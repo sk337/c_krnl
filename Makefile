@@ -3,6 +3,7 @@
 
 # Variables
 CXX := $(shell if command -v clang++ > /dev/null; then echo clang++; else echo g++; fi)
+MKISO := $(shell if command -v grub2_mkrescue > /dev/null; then echo grub2_mkrescue; else echo grub_mkrescue; fi)
 QEMU = qemu-system-i386
 SRC = src/main.cpp src/VGA.cpp
 ENTRY = entry.asm
