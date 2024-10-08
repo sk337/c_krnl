@@ -13,8 +13,8 @@ OUTPUT_ISO = main.iso
 OBJ = entry.o main.o VGA.o  # Include VGA.o here
 
 # Compilation flags
-CFLAGS = -c -g -m32 -Os -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -mno-red-zone -Wall -Wextra
-ASFLAGS = -g -f elf32
+CFLAGS = -c -m32 -Os -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -mno-red-zone -Wall -Wextra
+ASFLAGS = -f elf32
 LD_FLAGS = -m elf_i386 -nostdlib -T $(LINKER_SCRIPT)
 
 # Targets
