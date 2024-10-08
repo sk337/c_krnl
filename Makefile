@@ -35,7 +35,7 @@ $(OUTPUT_ELF): $(OBJ)
 $(OUTPUT_ISO): $(OUTPUT_ELF) iso/boot/grub/grub.cfg
 	mkdir -p $(ISO_DATA_DIR)/grub
 	cp $< $(ISO_DATA_DIR)
-	grub2-mkrescue -v -o $@ $(ISO_DIR)
+	$(MKISO) -o $@ $(ISO_DIR)
 
 clean:
 	rm -f *.elf *.o $(ISO_DIR)/*.elf *.img *.iso
