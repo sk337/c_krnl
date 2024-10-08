@@ -7,11 +7,11 @@ QEMU = qemu-system-i386
 SRC = src/main.cpp src/VGA.cpp
 ENTRY = entry.asm
 LINKER_SCRIPT = linker.ld
-ISO_DIR = iso/boot
+ISO_DATA_DIR = iso/boot/
+ISO_DIR = iso/
 OUTPUT_ELF = main.elf
 OUTPUT_ISO = main.iso
-OBJ = entry.o main.o VGA.o  # Include VGA.o here
-
+OBJ = entry.o main.o VGA.o
 # Compilation flags
 CFLAGS = -c -m32 -Os -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -mno-red-zone -Wall -Wextra
 ASFLAGS = -f elf32
@@ -32,9 +32,9 @@ $(OUTPUT_ELF): $(OBJ)
 	ld $(LD_FLAGS) -o $@ $(OBJ)
 
 $(OUTPUT_ISO): $(OUTPUT_ELF)
-	mkdir -p $(ISO_DIR)  # Ensure the directory exists
-	cp $< $(ISO_DIR)
-	grub2-mkrescue -o $@ $(ISO_DIR)/
+	mkdir -p $(ISO_DATA_DIR)  # Ensure the directory exists
+	cp $< $(ISO_DATA_DIR)
+	grub2-mkrescue -o $@ $(ISO_DIR)
 
 clean:
 	rm -f *.elf *.o $(ISO_DIR)/*.elf *.img *.iso
