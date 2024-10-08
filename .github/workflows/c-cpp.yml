@@ -12,19 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Install build dependencies
-        run: sudo apt-get install -y build-essential nasm xorriso grub2-common
-      - name: get all programs
-        run: compgen -c | sort > programs.txt
-      - name: upload program list
-        uses: actions/upload-artifact@v3.2.1-node20
-        with:
-          name: programs.txt
-      - name: make
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential nasm xorriso grub2-common
+
+      - name: Build project
         run: make main.iso
-      - name: Upload a Build Artifact
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v3.2.1-node20
         with:
-          # Artifact name
           name: main.iso
+          path: main.iso # specify the path to the artifact
+
+      - name: Clean up build artifacts
+        run: make clean
