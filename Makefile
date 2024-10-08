@@ -1,25 +1,52 @@
 .POSIX:
-.PHONY: clean run run-img
+.PHONY: clean run run-img debug launch-gdb all
 
-main.iso: main.elf
-	cp '$<' iso/boot
-	grub2-mkrescue -o '$@' iso/
+# Variables
+CXX := $(shell if command -v clang++ > /dev/null; then echo clang++; else echo g++; fi)
+QEMU = qemu-system-i386
+SRC = src/main.cpp src/VGA.cpp
+ENTRY = entry.asm
+LINKER_SCRIPT = linker.ld
+ISO_DIR = iso/boot
+OUTPUT_ELF = main.elf
+OUTPUT_ISO = main.iso
+OBJ = entry.o main.o VGA.o  # Include VGA.o here
 
-# main.elf is the the multiboot file.
-main.elf: entry.o main.o
-	ld -m elf_i386 -nostdlib -T linker.ld -o '$@' $^
+# Compilation flags
+CFLAGS = -c -g -m32 -Os -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -mno-red-zone -Wall -Wextra
+ASFLAGS = -g -f elf32
+LD_FLAGS = -m elf_i386 -nostdlib -T $(LINKER_SCRIPT)
 
-entry.o: entry.asm
-	nasm -f elf32 '$<' -o '$@'
+# Targets
+all: $(OUTPUT_ISO)
 
-main.o: src/main.cpp
-	clang++ -c -m32 -Os -fno-builtin -ffreestanding -fno-exceptions -fno-rtti -mno-red-zone -o '$@' -Wall -Wextra '$<'
+# Compile object files from source
+%.o: src/%.cpp
+	$(CXX) $(CFLAGS) -o $@ $<
+
+%.o: %.asm
+	nasm $(ASFLAGS) $< -o $@
+
+# Link object files to create ELF executable
+$(OUTPUT_ELF): $(OBJ)
+	ld $(LD_FLAGS) -o $@ $(OBJ)
+
+$(OUTPUT_ISO): $(OUTPUT_ELF)
+	mkdir -p $(ISO_DIR)  # Ensure the directory exists
+	cp $< $(ISO_DIR)
+	grub2-mkrescue -o $@ $(ISO_DIR)/
 
 clean:
-	rm -f *.elf *.o iso/boot/*.elf *.img *.iso
+	rm -f *.elf *.o $(ISO_DIR)/*.elf *.img *.iso
 
-run: main.elf
-	qemu-system-i386 -kernel '$<'
+run: $(OUTPUT_ELF)
+	$(QEMU) -kernel $<
 
-run-img: main.iso
-	qemu-system-i386 -hda '$<'
+debug: $(OUTPUT_DEBUG_ELF)
+	$(QEMU) -s -S -kernel $<
+
+launch-gdb:
+	gdb $< -ex 'target remote localhost:1234' -ex 'layout src' -ex 'layout regs'
+
+run-img: $(OUTPUT_ISO)
+	$(QEMU) -hda $<
